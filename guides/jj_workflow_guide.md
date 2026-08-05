@@ -344,3 +344,23 @@ jj new
 # 4. Push bookmark
 jj git push --remote origin --bookmark main
 ```
+
+
+### Issue: "Bookmark main@origin already matches main" / "Nothing changed"
+
+#### Cause:
+Your `main` bookmark is already pointing at the parent commit (`@-`), but your latest edits are sitting uncommitted inside your active working copy (`@`). Running `jj bookmark set main -r @-` does nothing because `main` is already sitting on `@-`.
+
+#### Fix:
+Use Pattern A to seal your active working copy into history first, advance `main` to that newly created parent commit, and push:
+
+```bash
+# 1. Seal your active working copy into history
+jj new
+
+# 2. Advance main to the newly completed parent commit (@-)
+jj bookmark set main -r @-
+
+# 3. Push to remote
+jj git push --remote origin --bookmark main
+```
