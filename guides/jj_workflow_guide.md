@@ -272,3 +272,75 @@ jj git push --remote origin --bookmark main
 # 6. Open a clean slate for the next task
 jj new
 ```
+
+
+---
+
+## 6. Common Errors & Troubleshooting
+
+### Error: "Won't push commit ... since it has no description"
+
+#### Cause:
+`jj` prevents pushing commits to a remote if any commit in the push chain is empty and lacks a description (e.g., an abandoned empty working copy left in history).
+
+#### Example Error Output:
+```text
+Error: Won't push commit b882ced106f1 since it has no description
+Hint: Rejected commit: pkkzsutv b882ced1 (empty) (no description set)
+```
+
+#### Solution Options:
+
+* **Option A: Abandon the Empty Commit (Recommended)**
+  If the empty commit was created accidentally or is no longer needed, abandon it. `jj` will automatically rebase and stitch your subsequent work onto its parent:
+  ```bash
+  jj abandon <commit-id-or-change-id>
+  ```
+
+* **Option B: Describe the Commit**
+  If you want to keep the commit, give it a description before pushing:
+  ```bash
+  jj describe -r <commit-id-or-change-id> -m "chore: commit description"
+  ```
+
+---
+
+## 7. The Two Valid Bookmark & Push Patterns
+
+To ensure you never accidentally include an empty active working copy (`@`) in a push, use one of these two standard workflows:
+
+### Pattern A: `jj new` First (Recommended)
+Close off your change into a parent commit (`@-`), set the bookmark to the parent, then push:
+
+```bash
+# 1. Label active change
+jj describe -m "feat: my changes"
+
+# 2. Open a new clean working copy (@)
+jj new
+
+# 3. Move bookmark to parent change (@-)
+jj bookmark set main -r @-
+
+# 4. Push bookmark
+jj git push --remote origin --bookmark main
+```
+
+---
+
+### Pattern B: Set Bookmark First, Then `jj new`
+Attach the bookmark directly to your active change (`@`), open a new working copy, then push:
+
+```bash
+# 1. Label active change
+jj describe -m "feat: my changes"
+
+# 2. Set bookmark to active change (@)
+jj bookmark set main -r @
+
+# 3. Open a new clean working copy (@) above main
+jj new
+
+# 4. Push bookmark
+jj git push --remote origin --bookmark main
+```
