@@ -79,8 +79,11 @@ Before running commands, it helps to understand how Jujutsu differs from traditi
 5. **Bookmarks Replace Branches:**
    In `jj` version 0.31+, branch markers (like `main` or `master`) are explicitly called **bookmarks**.
 
+6. **Why `jj new` BEFORE `jj bookmark set main -r @-` is the Recommended Workflow:**
+   * **Seals Your Work First:** Running `jj new` closes off your current working copy (`@`) and seals it into history as a parent commit (`@-`).
+   * **Prevents Accidental Empty/Undescribed Commits:** If you set the bookmark to `@` and push *before* running `jj new`, your working copy remains active. If you get interrupted or edit further, your next edits will bleed into the commit you already pushed—or leave an undescribed empty commit in the history chain.
+   * **Bulletproof Pushes:** Pointing `main` to the sealed parent (`@-`) ensures you only push finished, fully described commits to the remote.
 ---
-
 ## 3. Workflow Flowchart
 
 ```text
@@ -99,7 +102,7 @@ Before running commands, it helps to understand how Jujutsu differs from traditi
   jj describe -m "description"   <── Add commit message to current change
            │
            ▼
-        jj new                    <── Close change and open fresh working copy (@)
+        jj new                    <── Seal change into hustory and open clean working copy (@)
            │
            ▼
   jj bookmark set main -r @-      <── Point local 'main' bookmark to described parent (@-)
@@ -108,7 +111,7 @@ Before running commands, it helps to understand how Jujutsu differs from traditi
 jj git remote add origin <URL>    <── Link remote Git repository (SSH / HTTPS)
            │
            ▼
-jj git push --remote origin    --bookmark main --allow-new    <── Push bookmark & commits to remote
+jj git push --remote origin    --bookmark main \[--allow-new\]    <── Push bookmark & commits to remote. Add allow-new option if this is the first push. 
 ```
 
 ---
@@ -263,14 +266,16 @@ jj diff
 # 3. Describe your change
 jj describe -m "fix: sanitize user inputs in app.sh"
 
-# 4. Move local bookmark to completed change
+# 4. Open a clean slate for the next task
+jj new
+
+# 5. Move local bookmark to completed change
 jj bookmark set main -r @
 
-# 5. Push to remote
+# 6. Push to remote
 jj git push --remote origin --bookmark main
 
-# 6. Open a clean slate for the next task
-jj new
+
 ```
 
 
@@ -303,7 +308,24 @@ Hint: Rejected commit: pkkzsutv b882ced1 (empty) (no description set)
   jj describe -r <commit-id-or-change-id> -m "chore: commit description"
   ```
 
----
+### Issue: "Bookmark main@origin already matches main" / "Nothing changed"
+
+#### Cause:
+Your `main` bookmark is already pointing at the parent commit (`@-`), but your latest edits are sitting uncommitted inside your active working copy (`@`). Running `jj bookmark set main -r @-` does nothing because `main` is already sitting on `@-`.
+
+#### Fix:
+Use Pattern A to seal your active working copy into history first, advance `main` to that newly created parent commit, and push:
+
+```bash
+# 1. Seal your active working copy into history
+jj new
+
+# 2. Advance main to the newly completed parent commit (@-)
+jj bookmark set main -r @-
+
+# 3. Push to remote
+jj git push --remote origin --bookmark main
+```
 
 ## 7. The Two Valid Bookmark & Push Patterns
 
@@ -345,22 +367,3 @@ jj new
 jj git push --remote origin --bookmark main
 ```
 
-
-### Issue: "Bookmark main@origin already matches main" / "Nothing changed"
-
-#### Cause:
-Your `main` bookmark is already pointing at the parent commit (`@-`), but your latest edits are sitting uncommitted inside your active working copy (`@`). Running `jj bookmark set main -r @-` does nothing because `main` is already sitting on `@-`.
-
-#### Fix:
-Use Pattern A to seal your active working copy into history first, advance `main` to that newly created parent commit, and push:
-
-```bash
-# 1. Seal your active working copy into history
-jj new
-
-# 2. Advance main to the newly completed parent commit (@-)
-jj bookmark set main -r @-
-
-# 3. Push to remote
-jj git push --remote origin --bookmark main
-```
