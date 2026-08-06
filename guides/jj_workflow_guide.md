@@ -353,7 +353,9 @@ jj bookmark set main -r @-
 # 3. Push to remote
 jj git push --remote origin --bookmark main
 ```
+
 ---
+
 ## 7. The Two Valid Bookmark & Push Patterns
 
 To ensure you never accidentally include an empty active working copy (`@`) in a push, use one of these two standard workflows:
