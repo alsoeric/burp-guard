@@ -87,31 +87,58 @@ Before running commands, it helps to understand how Jujutsu differs from traditi
 ## 3. Workflow Flowchart
 
 ```text
+===================================================================
+  PASS 1: One-Time Repository Setup & Initial Push
+===================================================================
+
 [ Empty Project Directory ]
            │
            ▼
      jj git init                  <── Initialize Jujutsu repo with Git backend
            │
            ▼
-[ Edit files / add scripts ]
+jj git remote add origin <URL>    <── Link remote Git repository
            │
            ▼
-     jj status & jj diff          <── Inspect active changes (captured automatically)
+[ Add initial project files ]
            │
            ▼
-  jj describe -m "description"   <── Add commit message to current change
+  jj describe -m "initial commit" <── Describe initial commit (@)
            │
            ▼
-        jj new                    <── Seal change into hustory and open clean working copy (@)
+        jj new                    <── Seal commit (@-) and open clean working copy (@)
            │
            ▼
-  jj bookmark set main -r @-      <── Point local 'main' bookmark to described parent (@-)
+  jj bookmark set main -r @-      <── Point 'main' bookmark to described parent (@-)
            │
            ▼
-jj git remote add origin <URL>    <── Link remote Git repository (SSH / HTTPS)
+jj git push --remote origin \
+   --bookmark main --allow-new    <── Initial push (creates bookmark on remote)
+
+
+===================================================================
+  PASS 2: Ongoing Daily Iteration Loop
+===================================================================
+
+[ Edit files / make updates ]
            │
            ▼
-jj git push --remote origin    --bookmark main \[--allow-new\]    <── Push bookmark & commits to remote. Add allow-new option if this is the first push. 
+     jj status & jj diff          <── Inspect untracked / modified changes
+           │
+           ▼
+  jj describe -m "description"   <── Describe active change (@)
+           │
+           ▼
+        jj new                    <── Seal change into history (@-) and open clean working copy (@)
+           │
+           ▼
+  jj bookmark set main -r @-      <── Advance 'main' bookmark to described parent (@-)
+           │
+           ▼
+jj git push --remote origin \
+   --bookmark main                <── Push updated bookmark & commits to remote
+           │
+           └──────────────────────► (Repeat for next task)
 ```
 
 ---
@@ -270,7 +297,7 @@ jj describe -m "fix: sanitize user inputs in app.sh"
 jj new
 
 # 5. Move local bookmark to completed change
-jj bookmark set main -r @
+jj bookmark set main -r @-
 
 # 6. Push to remote
 jj git push --remote origin --bookmark main
@@ -326,7 +353,7 @@ jj bookmark set main -r @-
 # 3. Push to remote
 jj git push --remote origin --bookmark main
 ```
-
+---
 ## 7. The Two Valid Bookmark & Push Patterns
 
 To ensure you never accidentally include an empty active working copy (`@`) in a push, use one of these two standard workflows:
