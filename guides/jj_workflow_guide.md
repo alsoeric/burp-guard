@@ -354,6 +354,65 @@ jj bookmark set main -r @-
 jj git push --remote origin --bookmark main
 ```
 
+Error: "Refusing to move bookmark backwards or sideways: main"
+Cause:
+Occurs when your active change (@) or target commit was created off an older parent revision instead of being based directly on top of main. Moving main to a parallel commit is treated as a "sideways" move by jj.
+
+Fix:
+Rebase the target commit on top of main first to make it a direct linear descendant, then update the bookmark and push:
+
+Bash
+# 1. Rebase your target commit onto the current main bookmark
+jj rebase -r <commit_id> -d main
+
+# 2. Advance the main bookmark to the rebased commit
+jj bookmark set main -r <commit_id>
+
+# 3. Push to remote
+jj git push --remote origin --bookmark main
+Issue: Stale Remote / Diverged Bookmarks (main vs. main@origin)
+Cause:
+main was modified or pushed from another host/machine, leaving your local main pointer behind or diverged from main@origin.
+
+Fix Option A: Stack local work on top of latest remote main
+Bash
+# 1. Fetch latest remote commits and bookmark positions
+jj git fetch
+
+# 2. Rebase your working change (@) onto origin/main
+jj rebase -r @ -d main@origin
+
+# 3. Advance local main bookmark to your rebased change
+jj bookmark set main -r @
+
+# 4. Push updated bookmark to origin
+jj git push --remote origin --bookmark main
+Fix Option B: Reset local main pointer back to match origin
+Bash
+# 1. Fetch latest remote state
+jj git fetch
+
+# 2. Snap local bookmark back to match origin/main
+jj bookmark set main -r main@origin
+Issue: Flattening Accidental Branches / Parallel History
+Cause:
+Editing or running commands from a parent commit (@-) instead of main creates an unwanted parallel branch in jj log.
+
+Fix:
+Linearize your history by moving main to the specific commit and rebasing your working copy directly on top of it:
+
+Bash
+# 1. Identify your target commit ID or message in history
+jj log -r 'main | ::@'
+
+# 2. Point main directly to the desired commit
+jj bookmark set main -r 'description("your target commit message")'
+
+# 3. Rebase active working copy (@) onto main to clean up graph
+jj rebase -d main
+
+# 4. Push clean linear main to remote
+jj git push --remote origin --bookmark main
 ---
 
 ## 7. The Two Valid Bookmark & Push Patterns
