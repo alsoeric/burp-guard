@@ -288,29 +288,50 @@ jj log -r "main | main@origin"
 ```
 
 ---
+## 5. Daily Iteration & Context-Switching Loop
 
-## 5. Daily Iteration Loop
+In `jj`, your working directory (`@`) is automatically recorded as an active revision in real time. You do not need to push to a remote server just to save your place when switching repositories or tasks.
 
-For day-to-day ongoing development, follow this standard cycle:[cite: 5]
+---
+
+### Loop A: Context Switching & Local Breadcrumbs (Work-in-Progress)
+
+Use this loop whenever you reach a milestone, get interrupted, or need to switch context to another repository or task.
 
 ```bash
-# 1. Edit code / add features
-vim app.sh
+# 1. Label your active change with where you left off
+jj describe -m "WIP: refactoring auth, token refresh left to fix"
 
-# 2. Inspect status and diffs
+# 2. Seal the WIP change into local history and open a clean slate
+jj new
+
+# 3. Safely switch repositories or tasks (no push required)
+```
+
+> **Context Recovery Tip:**
+> When you return to the repository later, run `jj log`. The description on `@-` acts as your external memory and tells you exactly where you stopped.
+
+---
+
+### Loop B: Publishing Completed Work (Final Push)
+
+Use this loop only when a feature or fix is complete and ready to be published upstream to `main`.
+
+```bash
+# 1. Inspect status and final diffs
 jj status
 jj diff
 
-# 3. Describe your change
-jj describe -m "fix: sanitize user inputs in app.sh"
+# 2. Assign the final, clean commit message
+jj describe -m "feat: complete token refresh logic in auth module"
 
-# 4. Open a clean slate for the next task
+# 3. Seal the change into history and open a clean working copy
 jj new
 
-# 5. Move local bookmark to completed change
+# 4. Advance the local bookmark pointer to the completed parent commit (@-)
 jj bookmark set main -r @-
 
-# 6. Push to remote
+# 5. Push the bookmark to remote
 jj git push --remote origin --bookmark main
 ```
 
