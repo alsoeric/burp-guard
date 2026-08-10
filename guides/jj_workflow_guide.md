@@ -464,3 +464,42 @@ Check `jj log` to confirm both `main` and `main@origin` sit on the latest commit
 ```bash
 jj log -r 'main | main@origin | @'
 ```
+
+---
+
+### Issue: Multiple Empty Commits Stacked Above `main` After Scripted Pushes
+
+#### Cause:
+When an automated script or command sequence runs `jj new` multiple times (or pushes while the working copy becomes immutable), it can leave behind multiple empty, undescribed commits (`@` and `@-`) sitting on top of `main`.
+
+#### Example `jj log` Output:
+```text
+@  xzkxqltr user@domain 2026-08-10 17:25:52 3d4336e0
+│  (empty) (no description set)
+○  xyytrppv user@domain 2026-08-10 17:25:52 e499bf97
+│  (empty) (no description set)
+◆  sxnttvzv user@domain 2026-08-10 17:25:51 main a1b5acf6
+│  more markdown cleanup and more troubleshooting bits.
+```
+
+#### Fix:
+Abandon the empty parent commit (`@-`). `jj` will automatically collapse the chain and place your active working copy (`@`) directly on top of `main`:
+
+```bash
+jj abandon @-
+```
+
+#### Verification:
+Check `jj log` to confirm you have a single clean working copy on top of `main`:
+
+```bash
+jj log
+```
+
+```text
+@  a1b2c3d4 user@domain 2026-08-10 17:26:00 88xx99yy
+│  (empty) (no description set)
+◆  sxnttvzv user@domain 2026-08-10 17:25:51 main a1b5acf6
+│  more markdown cleanup and more troubleshooting bits.
+```
+
