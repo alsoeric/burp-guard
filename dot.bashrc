@@ -208,6 +208,12 @@ dtach_process_selection() {
 # LAYER 4: Core Logic (Orchestrator)
 # ==============================================================================
 dtach_auto() {
+    # Availability Guard: Fail softly if dtach binary is missing
+    if ! command -v dtach >/dev/null 2>&1; then
+        ddebug "dtach binary not found in PATH. Falling back to standard shell."
+        return 1
+    fi
+
     local host="${HOSTNAME%%.*}"
     local socket_dir="${HOME}/.dtach"
     ddebug "Entering dtach_auto() on host '${host}'"
@@ -249,6 +255,9 @@ fi
 # SSH Invocation Guard Block
 if [ -z "$DTACH_ACTIVE" ]; then
     if [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_CLIENT" ]; then
-        dtach_auto
+        # Only invoke dtach_auto if the executable is available
+        if command -v dtach >/dev/null 2>&1; then
+            dtach_auto
+        fi
     fi
 fi

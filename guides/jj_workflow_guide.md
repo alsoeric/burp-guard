@@ -1,6 +1,6 @@
 # Jujutsu (jj) Version Control Workflow Guide
 
-A complete, step-by-step practical reference for managing code repositories with **Jujutsu (`jj`)**—from initializing an empty directory to linking a remote Git server, managing changes, and pushing bookmarks.[cite: 5]
+A complete, step-by-step practical reference for managing code repositories with **Jujutsu (`jj`)**—from initializing an empty directory to linking a remote Git server, managing changes, and pushing bookmarks.
 
 ---
 
@@ -25,17 +25,17 @@ A complete, step-by-step practical reference for managing code repositories with
 
 ## 2. Fundamental Concepts & Terminology
 
-Before running commands, it helps to understand how Jujutsu differs from traditional Git:[cite: 5]
+Before running commands, it helps to understand how Jujutsu differs from traditional Git:
 
 1. **No `git add` is Ever Needed:**
-   `jj` automatically tracks all untracked files and modifications in real time within your current working change (`@`). You never need to stage files using `git add`.[cite: 5]
+   `jj` automatically tracks all untracked files and modifications in real time within your current working change (`@`). You never need to stage files using `git add`.
 
 2. **`jj describe` vs. `git commit`:**
-   * **In Git:** Running `git commit` creates a permanent snapshot, closes the current commit, and moves your branch pointer forward. To add a message, you must commit.[cite: 5]
-   * **In `jj`:** Running `jj describe` does **not** close a commit or create a new revision in history. It simply updates or renames the text message on your *current active change* (`@`). You can run `jj describe` multiple times on the same change to refine its message without creating extra commits.[cite: 5]
+   * **In Git:** Running `git commit` creates a permanent snapshot, closes the current commit, and moves your branch pointer forward. To add a message, you must commit.
+   * **In `jj`:** Running `jj describe` does **not** close a commit or create a new revision in history. It simply updates or renames the text message on your *current active change* (`@`). You can run `jj describe` multiple times on the same change to refine its message without creating extra commits.
 
 3. **Multiple `jj describe`s Before `jj new` (Example):**
-   If you make edits and run `jj describe` multiple times *without* running `jj new`, you are just overwriting the commit message on that single change:[cite: 5]
+   If you make edits and run `jj describe` multiple times *without* running `jj new`, you are just overwriting the commit message on that single change:
    
    ```bash
    # 1. Edit code
@@ -45,7 +45,7 @@ Before running commands, it helps to understand how Jujutsu differs from traditi
    jj describe -m "feat: complete bashrc script" # Overwrites previous message
    ```
    
-   **What `jj log` looks like:**[cite: 5]
+   **What `jj log` looks like:**
    
    ```text
    @  pkkzsutv user@domain 2026-08-05 16:00:00 20bb42f8
@@ -53,10 +53,10 @@ Before running commands, it helps to understand how Jujutsu differs from traditi
    ◆  zzzzzzzz root() 00000000
    ```
    
-   *Result:* Only **one** commit exists in history. The second `jj describe` simply replaced the text of the first.[cite: 5]
+   *Result:* Only **one** commit exists in history. The second `jj describe` simply replaced the text of the first.
 
 4. **`jj new` is What Creates Separate Commits:**
-   To turn your work into multiple distinct commits in history, you must use `jj new` to finalize the current change and open a new one:[cite: 5]
+   To turn your work into multiple distinct commits in history, you must use `jj new` to finalize the current change and open a new one:
    
    ```bash
    # First Commit
@@ -69,7 +69,7 @@ Before running commands, it helps to understand how Jujutsu differs from traditi
    jj describe -m "feat: configure bash_profile"
    ```
    
-   **What `jj log` looks like now:**[cite: 5]
+   **What `jj log` looks like now:**
    
    ```text
    @  a1b2c3d4 user@domain 2026-08-05 16:05:00 99xx88yy
@@ -80,12 +80,12 @@ Before running commands, it helps to understand how Jujutsu differs from traditi
    ```
 
 5. **Bookmarks Replace Branches:**
-   In `jj` version 0.31+, branch markers (like `main` or `master`) are explicitly called **bookmarks**.[cite: 5]
+   In `jj` version 0.31+, branch markers (like `main` or `master`) are explicitly called **bookmarks**.
 
 6. **Why `jj new` BEFORE `jj bookmark set main -r @-` is the Recommended Workflow:**
-   * **Seals Your Work First:** Running `jj new` closes off your current working copy (`@`) and seals it into history as a parent commit (`@-`).[cite: 5]
-   * **Prevents Accidental Empty/Undescribed Commits:** If you set the bookmark to `@` and push *before* running `jj new`, your working copy remains active. If you get interrupted or edit further, your next edits will bleed into the commit you already pushed—or leave an undescribed empty commit in the history chain.[cite: 5]
-   * **Bulletproof Pushes:** Pointing `main` to the sealed parent (`@-`) ensures you only push finished, fully described commits to the remote.[cite: 5]
+   * **Seals Your Work First:** Running `jj new` closes off your current working copy (`@`) and seals it into history as a parent commit (`@-`).
+   * **Prevents Accidental Empty/Undescribed Commits:** If you set the bookmark to `@` and push *before* running `jj new`, your working copy remains active. If you get interrupted or edit further, your next edits will bleed into the commit you already pushed—or leave an undescribed empty commit in the history chain.
+   * **Bulletproof Pushes:** Pointing `main` to the sealed parent (`@-`) ensures you only push finished, fully described commits to the remote.
 
 ---
 
@@ -152,7 +152,7 @@ jj git push --remote origin \
 
 ### Step 1: Initialize a New Jujutsu Repository
 
-Navigate to your target directory (or create a new one) and initialize Jujutsu with a Git storage backend:[cite: 5]
+Navigate to your target directory (or create a new one) and initialize Jujutsu with a Git storage backend:
 
 ```bash
 mkdir -p ~/Projects/my-app
@@ -166,7 +166,7 @@ jj git init
 
 ### Step 2: Make Changes & Manage the Working Copy
 
-Create your project files as normal. `jj` automatically tracks file additions and updates in the working change (`@`).[cite: 5]
+Create your project files as normal. `jj` automatically tracks file additions and updates in the working change (`@`).
 
 ```bash
 # Create files
@@ -185,7 +185,7 @@ jj diff
 
 ### Step 3: Describe and Complete the Change
 
-Assign a commit message to your change, then open a clean slate for subsequent work:[cite: 5]
+Assign a commit message to your change, then open a clean slate for subsequent work:
 
 ```bash
 # 1. Label/describe the current working change (@)
@@ -195,13 +195,13 @@ jj describe -m "feat: initial project structure and entry script"
 jj new
 ```
 
-To view your newly committed change in the revision graph:[cite: 5]
+To view your newly committed change in the revision graph:
 
 ```bash
 jj log
 ```
 
-**Example Log Output:**[cite: 5]
+**Example Log Output:**
 
 ```text
 @  pkkzsutv user@domain 2026-08-05 16:00:00 20bb42f8
@@ -215,11 +215,11 @@ jj log
 
 ### Step 4: Link to a Remote Git Repository
 
-Add your remote repository endpoint. Choose SSH (preferred) or HTTPS depending on your infrastructure setup.[cite: 5]
+Add your remote repository endpoint. Choose SSH (preferred) or HTTPS depending on your infrastructure setup.
 
 #### Option A: Adding a New Remote (`jj git remote add`)
 
-Use `add` when configuring a remote for the first time in this local repository:[cite: 5]
+Use `add` when configuring a remote for the first time in this local repository:
 
 ```bash
 # SSH Remote (using host alias or explicit address)
@@ -231,7 +231,7 @@ jj git remote add origin giteaserver:username/my-app.git
 
 #### Option B: Modifying an Existing Remote (`jj git remote set-url`)
 
-If `origin` already exists (e.g., previously set to an HTTPS URL or expired certificate domain) and needs updating:[cite: 5]
+If `origin` already exists (e.g., previously set to an HTTPS URL or expired certificate domain) and needs updating:
 
 ```bash
 jj git remote set-url origin giteaserver:username/my-app.git
@@ -241,15 +241,15 @@ jj git remote set-url origin giteaserver:username/my-app.git
 
 ### Step 5: Assign the Bookmark Pointer
 
-Set your local bookmark marker (`main`) to point at your completed parent revision (`@-`):[cite: 5]
+Set your local bookmark marker (`main`) to point at your completed parent revision (`@-`):
 
 ```bash
 jj bookmark set main -r @-
 ```
 
-> **Syntax Tip:**[cite: 5]
-> * `@` refers to your current empty working copy.[cite: 5]
-> * `@-` refers to the parent commit directly beneath your current working copy (the change described in Step 3).[cite: 5]
+> **Syntax Tip:**
+> * `@` refers to your current empty working copy.
+> * `@-` refers to the parent commit directly beneath your current working copy (the change described in Step 3).
 
 ---
 
@@ -257,7 +257,7 @@ jj bookmark set main -r @-
 
 #### First Push (Creating Remote Bookmark)
 
-Because the `main` bookmark does not exist on the remote server yet, include `--allow-new`:[cite: 5]
+Because the `main` bookmark does not exist on the remote server yet, include `--allow-new`:
 
 ```bash
 jj git push --remote origin --bookmark main --allow-new
@@ -265,7 +265,7 @@ jj git push --remote origin --bookmark main --allow-new
 
 #### Subsequent Pushes
 
-For ongoing updates after the remote bookmark has been initialized:[cite: 5]
+For ongoing updates after the remote bookmark has been initialized:
 
 ```bash
 jj git push --remote origin --bookmark main
@@ -275,19 +275,20 @@ jj git push --remote origin --bookmark main
 
 ### Step 7: Verification
 
-Verify that your local bookmark and remote tracking bookmark match:[cite: 5]
+Verify that your local bookmark and remote tracking bookmark match:
 
 ```bash
 jj log -r "main | main@origin"
 ```
 
-**Expected Output:** Both `main` and `main@origin` sit on the exact same commit hash:[cite: 5]
+**Expected Output:** Both `main` and `main@origin` sit on the exact same commit hash:
 
 ```text
 ○  ousyuzlm user@domain 2026-08-05 15:58:00 main main@origin | feat: initial project structure...
 ```
 
 ---
+
 ## 5. Daily Iteration & Context-Switching Loop
 
 In `jj`, your working directory (`@`) is automatically recorded as an active revision in real time. You do not need to push to a remote server just to save your place when switching repositories or tasks.
@@ -342,7 +343,7 @@ jj git push --remote origin --bookmark main
 ### Error: "Won't push commit ... since it has no description"
 
 #### Cause:
-`jj` prevents pushing commits to a remote if any commit in the push chain is empty and lacks a description (e.g., an abandoned empty working copy left in history).[cite: 5]
+`jj` prevents pushing commits to a remote if any commit in the push chain is empty and lacks a description (e.g., an abandoned empty working copy left in history).
 
 #### Example Error Output:
 ```text
@@ -352,13 +353,13 @@ Hint: Rejected commit: pkkzsutv b882ced1 (empty) (no description set)
 
 #### Solution Options:
 * **Option A: Abandon the Empty Commit (Recommended)**
-  If the empty commit was created accidentally or is no longer needed, abandon it:[cite: 5]
+  If the empty commit was created accidentally or is no longer needed, abandon it:
   ```bash
   jj abandon <commit-id-or-change-id>
   ```
 
 * **Option B: Describe the Commit**
-  If you want to keep the commit, give it a description before pushing:[cite: 5]
+  If you want to keep the commit, give it a description before pushing:
   ```bash
   jj describe -r <commit-id-or-change-id> -m "chore: commit description"
   ```
@@ -368,10 +369,10 @@ Hint: Rejected commit: pkkzsutv b882ced1 (empty) (no description set)
 ### Issue: "Bookmark main@origin already matches main" / "Nothing changed"
 
 #### Cause:
-Your `main` bookmark is already pointing at the parent commit (`@-`), but your latest edits are sitting uncommitted inside your active working copy (`@`). Running `jj bookmark set main -r @-` does nothing because `main` is already sitting on `@-`.[cite: 5]
+Your `main` bookmark is already pointing at the parent commit (`@-`), but your latest edits are sitting uncommitted inside your active working copy (`@`). Running `jj bookmark set main -r @-` does nothing because `main` is already sitting on `@-`.
 
 #### Fix:
-Seal your active working copy into history first, advance `main` to that newly created parent commit, and push:[cite: 5]
+Seal your active working copy into history first, advance `main` to that newly created parent commit, and push:
 
 ```bash
 # 1. Seal your active working copy into history
@@ -389,10 +390,10 @@ jj git push --remote origin --bookmark main
 ### Error: "Refusing to move bookmark backwards or sideways: main"
 
 #### Cause:
-Occurs when your active change (`@`) or target commit was created off an older parent revision instead of being based directly on top of `main`. Moving `main` to a parallel commit is treated as a "sideways" move by `jj`.[cite: 5]
+Occurs when your active change (`@`) or target commit was created off an older parent revision instead of being based directly on top of `main`. Moving `main` to a parallel commit is treated as a "sideways" move by `jj`.
 
 #### Fix:
-Rebase the target commit on top of `main` first to make it a direct linear descendant, then update the bookmark and push:[cite: 5]
+Rebase the target commit on top of `main` first to make it a direct linear descendant, then update the bookmark and push:
 
 ```bash
 # 1. Rebase your target commit onto the current main bookmark
@@ -410,7 +411,7 @@ jj git push --remote origin --bookmark main
 ### Issue: Stale Remote / Diverged Bookmarks (`main` vs. `main@origin`)
 
 #### Cause:
-`main` was modified or pushed from another host/machine, leaving your local `main` pointer behind or diverged from `main@origin`.[cite: 5]
+`main` was modified or pushed from another host/machine, leaving your local `main` pointer behind or diverged from `main@origin`.
 
 #### Fix Option A: Stack local work on top of latest remote `main`
 ```bash
@@ -441,10 +442,10 @@ jj bookmark set main -r main@origin
 ### Issue: Flattening Accidental Branches / Parallel History
 
 #### Cause:
-Editing or running commands from a parent commit (`@-`) instead of `main` creates an unwanted parallel branch in `jj log`.[cite: 5]
+Editing or running commands from a parent commit (`@-`) instead of `main` creates an unwanted parallel branch in `jj log`.
 
 #### Fix:
-Linearize your history by moving `main` to the specific commit and rebasing your working copy directly on top of it:[cite: 5]
+Linearize your history by moving `main` to the specific commit and rebasing your working copy directly on top of it:
 
 ```bash
 # 1. Identify your target commit ID or message in history
@@ -465,7 +466,7 @@ jj git push --remote origin --bookmark main
 ### Issue: Pulling Changes Made on Remote / Web Interface
 
 #### Cause:
-Changes were committed directly on a remote server (e.g., via Gitea or GitHub web interface) and need to be synced down into your local working copy.[cite: 5]
+Changes were committed directly on a remote server (e.g., via Gitea or GitHub web interface) and need to be synced down into your local working copy.
 
 #### Fix:
 ```bash
@@ -480,7 +481,7 @@ jj bookmark set main -r main@origin
 ```
 
 #### Verification:
-Check `jj log` to confirm both `main` and `main@origin` sit on the latest commit with your working copy (`@`) directly on top:[cite: 5]
+Check `jj log` to confirm both `main` and `main@origin` sit on the latest commit with your working copy (`@`) directly on top:
 
 ```bash
 jj log -r 'main | main@origin | @'
@@ -523,4 +524,3 @@ jj log
 ◆  sxnttvzv user@domain 2026-08-10 17:25:51 main a1b5acf6
 │  more markdown cleanup and more troubleshooting bits.
 ```
-
