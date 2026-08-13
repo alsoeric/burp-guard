@@ -52,24 +52,39 @@ dtach_is_attached() {
     [ "$count" -ge 2 ]
 }
 
-# Portable Dead Socket Purge
+# Portable Dead Socket Purge (Self-Contained UI Output)
 dtach_cleanup_dead_sockets() {
     local socket_dir="$1"
     local host="$2"
-    
+    local dead_sessions=()
+
     ddebug "Cleaning dead sockets in ${socket_dir}..."
     for s in "$socket_dir"/${host}__*.sock; do
         [ -e "$s" ] || continue
         if ! ss -xla 2>/dev/null | grep -q "$s"; then
-	    local sock_name
-            sock_name=$(basename "$s")
-	    
-	    # Log directly to syslog under tag 'dtach'
-            logger -t dtach "Removed dead socket: ${sock_name}"
+            local raw_name sess_name mod_time
+            raw_name=$(basename "$s" .sock)
+            sess_name="${raw_name#*__}"
+            mod_time=$(date -r "$s" '+%H:%M %b %d')
+
+            # 1. Audit log to syslog
+            logger -t dtach "Removed dead socket: ${raw_name}.sock"
+
+            # 2. Capture for local UI display
+            dead_sessions+=("  • ${sess_name} (${mod_time})")
+
+            # 3. Purge socket file
             ddebug "Removing stale socket file: $s"
             rm -f "$s"
         fi
     done
+
+    # Print summary block ONLY if dead sockets were removed
+    if [ "${#dead_sessions[@]}" -gt 0 ]; then
+        echo "=== dtach Dead Sessions Removed [Host: ${host}] ==="
+        printf '%s\n' "${dead_sessions[@]}"
+        echo ""
+    fi
 }
 
 # Friendly Name Generator
@@ -148,7 +163,7 @@ dtach_render_menu() {
     shift
     local sockets=("$@")
 
-    echo "=== dtach Sessions [Host: ${host}] ==="
+    echo "=== dtach Available Sessions [Host: ${host}] ==="
     echo "  1) [+] Create a new session"
 
     local i=2
@@ -200,7 +215,7 @@ dtach_auto() {
     mkdir -p "$socket_dir"
     chmod 700 "$socket_dir"
 
-    # 1. Maintenance
+    # 1. Maintenance & UI notice for dead sockets
     dtach_cleanup_dead_sockets "$socket_dir" "$host"
 
     # 2. Collect active sockets
