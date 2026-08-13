@@ -61,6 +61,11 @@ dtach_cleanup_dead_sockets() {
     for s in "$socket_dir"/${host}__*.sock; do
         [ -e "$s" ] || continue
         if ! ss -xla 2>/dev/null | grep -q "$s"; then
+	    local sock_name
+            sock_name=$(basename "$s")
+	    
+	    # Log directly to syslog under tag 'dtach'
+            logger -t dtach "Removed dead socket: ${sock_name}"
             ddebug "Removing stale socket file: $s"
             rm -f "$s"
         fi
